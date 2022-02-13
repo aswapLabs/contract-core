@@ -1,0 +1,42 @@
+//! account: alice, 10000000000000 0x1::STC::STC
+//! account: joe
+//! account: admin, 0x3db7a2da7444995338a2413b151ee437, 10000000000000 0x1::STC::STC
+//! account: liquidier, 10000000000000 0x1::STC::STC
+//! account: exchanger
+//! account: tokenholder, 0x49156896A605F092ba1862C50a9036c9
+
+
+//! new-transaction
+//! sender: admin
+address admin = {{admin}};
+script {
+    use 0x1::Debug;
+    use 0x1::Token;
+    use 0x1::Account;
+    use 0x0A7B8DAb322448AF454FccAfFBCbF247::Token1::{Self, Token1};
+    use 0x0A7B8DAb322448AF454FccAfFBCbF247::Token2::Token2;
+    use 0x0A7B8DAb322448AF454FccAfFBCbF247::Pair;
+
+    fun swap_test(account: signer) {
+        Token1::init(&account);
+        Token1::mint(&account, 100000);
+        let token1 = Account::withdraw<Token1>(&account, 100000);
+        let token2 = Token::zero<Token2>();
+
+        let (r1, r2, _) = Pair::get_reserves<Token1, Token2>();
+
+        let token2_out = r2 - (r1 * r2) / (r1 + 100000);
+        Debug::print(&token2_out);
+        //let (token1_swap, token2_swap) = Pair<Token1, Token2>(token1, 0 ,token2, token2_out);
+        // let value1 = Token::value<Token1>(&token1_swap);
+        // let value2 = Token::value<Token1>(&token2_swap);
+        // Debug::print(&value1);
+        // Debug::print(&value2);
+        Account::deposit_to_self<Token1>(&account, token1);
+        Account::deposit_to_self<Token2>(&account, token2);
+        
+       
+    
+    }
+}
+// check: EXECUTED
